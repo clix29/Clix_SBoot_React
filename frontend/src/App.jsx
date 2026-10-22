@@ -11,6 +11,8 @@ function App() {
   const [page, setPage] = useState('home');
   const [menu, setMenu] = useState(false);
   const [message, setMessage] = useState('');
+  const [search, setSearch] = useState('');
+  const [searchDelay, setSearchDelay] = useState('');
 
 
 
@@ -64,10 +66,34 @@ function App() {
     }
   }
 
+  const searchStudent = () => {
+    const result = [];
+
+     if(searchDelay === ''){
+       return student;
+     }
+
+     for(let i = 0; i < student.length; i++){
+
+          if(String(student[i].id).includes(searchDelay) || student[i].name.toLowerCase().includes(searchDelay.toLowerCase())){
+              result.push(student[i])
+          }
+    }
+     return result;
+  }
+
 
   useEffect(() => {
     fetchStudent()
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchDelay(search);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   return(
 
@@ -140,8 +166,8 @@ function App() {
         {page === 'view' && (
             <div className="student-table">
               <button type="button" className="close-table" onClick={() => setPage('home')}>close</button>
-          <h2>Student List</h2>
-
+              <h2>Student List</h2>
+              <input type="text" placeholder="search by ID or name" value={search} onChange={(e) => setSearch(e.target.value)}/>
            <table>
              <thead>
              <tr>
@@ -152,7 +178,7 @@ function App() {
              </tr>
              </thead>
              <tbody>
-             {student.map((stud) => (
+             {searchStudent().map((stud) => (
                  <tr key={stud.id}>
                  <td>{stud.id}</td>
                  <td>{stud.name}</td>
